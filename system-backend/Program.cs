@@ -10,6 +10,9 @@ using System.Text;
 using system_backend.Services;
 using Microsoft.OpenApi.Models;
 using system_backend;
+using system_backend.Repository.Interfaces;
+using system_backend.Repository;
+using system_backend.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,13 +26,14 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(typeof(MapConfig));
 
+builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+
 //Auth
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
 
 builder.Services.AddScoped<IAuthServices, AuthServices>();
-
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

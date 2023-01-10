@@ -64,6 +64,7 @@ namespace system_backend.Services
         public async Task<AuthModel> LoginAsync(LoginModel model)
         {
             var authModel = new AuthModel();
+            
 
             var user = await _userManager.FindByNameAsync(model.userName);
 

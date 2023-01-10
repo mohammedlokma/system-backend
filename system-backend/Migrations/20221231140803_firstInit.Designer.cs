@@ -12,8 +12,8 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221221094918_test")]
-    partial class test
+    [Migration("20221231140803_firstInit")]
+    partial class firstInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -176,16 +176,6 @@ namespace system_backend.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
-                    b.Property<string>("FirstName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("LastName")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
 
@@ -214,6 +204,11 @@ namespace system_backend.Migrations
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<string>("UserDisplayName")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)

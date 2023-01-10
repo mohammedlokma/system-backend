@@ -5,7 +5,6 @@ using system_backend.Services;
 
 namespace system_backend.Controllers
 {
-    //[Authorize(Roles ="Admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class AuthController : Controller
@@ -15,6 +14,8 @@ namespace system_backend.Controllers
         {
             _authServices = authServices;
         }
+
+        [Authorize(Roles = "Admin")]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {
