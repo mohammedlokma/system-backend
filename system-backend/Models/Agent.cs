@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace system_backend.Models
 {
-    public class Agent : IdentityUser
+    public class Agent 
     {
-        [Required, MaxLength(50)]
-        public string UserDisplayName { get; set; }
+        [Key]
+        public string Id { get; set; }
         public float custody { get; set; }
-        public ICollection<ServicePlaces> ServicePlaces { get; set; }
+        public ICollection<AgentServicePlaces> ServicePlaces { get; set; }
         public ICollection<ExpensesPayments> Expenses { get; set; }
         public ICollection<CouponsPayments> Coupons { get; set; }
 

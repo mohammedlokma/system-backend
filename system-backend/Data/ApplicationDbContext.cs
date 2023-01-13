@@ -13,6 +13,7 @@ namespace system_backend.Data
         public DbSet<Agent> Agents { get; set; }
 
         public DbSet<ServicePlaces> ServicePlaces { get; set; }
+        public DbSet<AgentServicePlaces> AgentServicePlaces { get; set; }
 
         public DbSet<ExpensesPayments> Expenses { get; set; }
         public DbSet<CouponsPayments> Coupons { get; set; }

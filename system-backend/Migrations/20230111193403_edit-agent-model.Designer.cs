@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using system_backend.Data;
 
@@ -11,9 +12,10 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230111193403_edit-agent-model")]
+    partial class editagentmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,6 +23,21 @@ namespace system_backend.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("AgentServicePlaces", b =>
+                {
+                    b.Property<string>("AgentsId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ServicePlacesId")
+                        .HasColumnType("int");
+
+                    b.HasKey("AgentsId", "ServicePlacesId");
+
+                    b.HasIndex("ServicePlacesId");
+
+                    b.ToTable("AgentServicePlaces");
+                });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -160,9 +177,6 @@ namespace system_backend.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("ServicePlacesId")
-                        .HasColumnType("int");
-
                     b.Property<string>("UserDisplayName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -173,33 +187,7 @@ namespace system_backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ServicePlacesId");
-
                     b.ToTable("Agents");
-                });
-
-            modelBuilder.Entity("system_backend.Models.AgentServicePlaces", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("AgentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("ServicePlacesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AgentId");
-
-                    b.HasIndex("ServicePlacesId");
-
-                    b.ToTable("AgentServicePlaces");
                 });
 
             modelBuilder.Entity("system_backend.Models.ApplicationUser", b =>
@@ -357,6 +345,21 @@ namespace system_backend.Migrations
                     b.ToTable("ServicePlaces");
                 });
 
+            modelBuilder.Entity("AgentServicePlaces", b =>
+                {
+                    b.HasOne("system_backend.Models.Agent", null)
+                        .WithMany()
+                        .HasForeignKey("AgentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("system_backend.Models.ServicePlaces", null)
+                        .WithMany()
+                        .HasForeignKey("ServicePlacesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -408,32 +411,6 @@ namespace system_backend.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("system_backend.Models.Agent", b =>
-                {
-                    b.HasOne("system_backend.Models.ServicePlaces", null)
-                        .WithMany("Agents")
-                        .HasForeignKey("ServicePlacesId");
-                });
-
-            modelBuilder.Entity("system_backend.Models.AgentServicePlaces", b =>
-                {
-                    b.HasOne("system_backend.Models.Agent", "Agent")
-                        .WithMany("ServicePlaces")
-                        .HasForeignKey("AgentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("system_backend.Models.ServicePlaces", "ServicePlaces")
-                        .WithMany()
-                        .HasForeignKey("ServicePlacesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Agent");
-
-                    b.Navigation("ServicePlaces");
-                });
-
             modelBuilder.Entity("system_backend.Models.CouponsPayments", b =>
                 {
                     b.HasOne("system_backend.Models.Agent", "Agent")
@@ -461,13 +438,6 @@ namespace system_backend.Migrations
                     b.Navigation("Coupons");
 
                     b.Navigation("Expenses");
-
-                    b.Navigation("ServicePlaces");
-                });
-
-            modelBuilder.Entity("system_backend.Models.ServicePlaces", b =>
-                {
-                    b.Navigation("Agents");
                 });
 #pragma warning restore 612, 618
         }

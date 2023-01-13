@@ -1,6 +1,6 @@
 ﻿using Microsoft.Build.Framework;
 
-namespace system_backend.Models
+namespace system_backend.Models.Dtos
 {
     public class LoginModel
     {

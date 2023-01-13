@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace system_backend.Models
+namespace system_backend.Models.Dtos
 {
     public class RegisterModel
     {

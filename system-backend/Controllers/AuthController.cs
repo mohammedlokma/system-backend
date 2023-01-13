@@ -1,6 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using system_backend.Models;
+using Microsoft.Build.Framework;
+using system_backend.Const;
+using system_backend.Data;
+using system_backend.Models.Dtos;
+using system_backend.Repository.Interfaces;
 using system_backend.Services;
 
 namespace system_backend.Controllers
@@ -9,13 +13,15 @@ namespace system_backend.Controllers
     [ApiController]
     public class AuthController : Controller
     {
-        private IAuthServices _authServices;
-        public AuthController(IAuthServices authServices)
+        private readonly IAuthServices _authServices;
+        private readonly ApplicationDbContext _db;
+        public AuthController(IAuthServices authServices,ApplicationDbContext db)
         {
             _authServices = authServices;
+            _db = db;
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [HttpPost("CreateUser")]
         public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
         {
@@ -29,7 +35,8 @@ namespace system_backend.Controllers
                 return BadRequest(result.Message);
 
             }
-            
+            _db.SaveChangesAsync();
+
             return Ok(result);
         }
         [HttpPost("Login")]

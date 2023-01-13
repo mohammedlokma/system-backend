@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -7,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using system_backend.Helpers;
 using system_backend.Models;
+using system_backend.Models.Dtos;
 
 namespace system_backend.Services
 {
@@ -26,13 +28,13 @@ namespace system_backend.Services
             _mapper = mapper;
         }
 
-        public async Task<AuthModel> RegisterAsync(RegisterModel model)
+        public async Task<AuthModel>RegisterAsync(RegisterModel model)
         {
             if (await _userManager.FindByNameAsync(model.UserName) is not null)
-                return new AuthModel { Message = "اسم المستخدم مستخدم بالفعل!" };
+                return new AuthModel { Message = "اسم المستخدم موجود بالفعل!" };
+            if(await _userManager.Users.FirstOrDefaultAsync(x => x.UserDisplayName == model.UserDisplayName) is not null)
+                return new AuthModel { Message = "UserDisplayName is already registered " };
 
-            if (await _userManager.FindByNameAsync(model.UserDisplayName) is not null)
-                return new AuthModel { Message = "UserDisplayName is already registered!" };
             var user = _mapper.Map<ApplicationUser>(model);
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -53,6 +55,7 @@ namespace system_backend.Services
 
             return new AuthModel
             {
+                UserId = user.Id,
                 Username = user.UserName,
                 ExpiresOn = jwtSecurityToken.ValidTo,
                 IsAuthenticated = true,

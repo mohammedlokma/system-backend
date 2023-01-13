@@ -12,7 +12,7 @@ namespace system_backend.Repository
         internal DbSet<T> dbSet;
         public BaseRepository(ApplicationDbContext db)
         {
-            _db = _db;
+            _db = db;
             this.dbSet = _db.Set<T>();
 
         }

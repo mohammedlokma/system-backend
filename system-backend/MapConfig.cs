@@ -10,6 +10,15 @@ namespace system_backend
 
             CreateMap<RegisterModel, ApplicationUser>().ReverseMap();
             CreateMap<ApplicationUser, AdminDTO>().ReverseMap();
+            CreateMap<RegisterAgentModel, ApplicationUser>().ReverseMap();
+            CreateMap<RegisterModel, RegisterAgentModel>().ReverseMap();
+            CreateMap<RegisterAgentModel, Agent>().ReverseMap();
+            CreateMap<AgentServicePlaces, ServicePlacesDTO>().ReverseMap();
+            CreateMap<Agent, AgentDTO>().ReverseMap();
+            CreateMap<Agent, AgentModel>().ReverseMap();
+            CreateMap<Agent, AgentUpdateDTO>().ReverseMap();
+            CreateMap<CouponsPayments, CouponDTO>().ReverseMap();
+
         }
     }
 }

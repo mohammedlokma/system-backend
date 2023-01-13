@@ -3,7 +3,7 @@
     public interface IUnitOfWork : IDisposable
     {
         IAdminsRepository Admins { get; }
-
+        IAgentRepository Agents { get; }
         Task SaveAsync();
 
     }

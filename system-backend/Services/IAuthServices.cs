@@ -1,4 +1,4 @@
-﻿using system_backend.Models;
+﻿using system_backend.Models.Dtos;
 
 namespace system_backend.Services
 {
