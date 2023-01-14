@@ -1,46 +1,44 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using system_backend.Const;
+using system_backend.Data;
 using system_backend.Models.Dtos;
 using system_backend.Models;
-using AutoMapper;
-using system_backend.Repository.Interfaces;
-using system_backend.Repository;
-using system_backend.Data;
 using Microsoft.EntityFrameworkCore;
 
 namespace system_backend.Controllers.Agents
 {
     [Route("api/[controller]")]
     [ApiController]
+    public class ExpensesController : ControllerBase
+    {
+        protected ApiRespose _response;
+        private readonly ApplicationDbContext _db;
+        private readonly IMapper _mapper;
 
-    public class CouponsController : ControllerBase { 
-            protected ApiRespose _response;
-            private readonly ApplicationDbContext _db;
-            private readonly IMapper _mapper;
 
-
-        public CouponsController(ApplicationDbContext db, IMapper mapper)
+        public ExpensesController(ApplicationDbContext db, IMapper mapper)
         {
             _db = db;
             _mapper = mapper;
             _response = new();
         }
-        [HttpGet("GetCoupons")]
-        [Authorize(Roles = Roles.User_Role+","+Roles.Admin_Role)]
+        [HttpGet("GetExpenses")]
+        [Authorize(Roles = Roles.User_Role + "," + Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> GetCoupons(string id)
+        public async Task<ActionResult<ApiRespose>> GetExpenses(string id)
         {
             try
             {
 
-                var coupons = await _db.Coupons.Where(i=>i.AgentId == id).ToListAsync();
-                _response.Result = _mapper.Map<List<CouponDTO>>(coupons);
+                var expenses = await _db.Expenses.Where(i=>i.AgentId == id).ToListAsync();
+                _response.Result = _mapper.Map<List<ExpenseDTO>>(expenses);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response.Result);
             }
@@ -52,25 +50,25 @@ namespace system_backend.Controllers.Agents
             }
             return _response;
         }
-        [HttpPost("CreateCoupon")]
+        [HttpPost("CreateExpense")]
         [Authorize(Roles = Roles.User_Role)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> CreateCoupon([FromBody] CouponDTO couponModel)
+        public async Task<ActionResult<ApiRespose>> CreateExpense([FromBody] ExpenseDTO expenseModel)
         {
             try
             {
 
-                if (couponModel == null)
+                if (expenseModel == null)
                 {
-                    return BadRequest(couponModel);
+                    return BadRequest(expenseModel);
                 }
 
-                var coupon = _mapper.Map<CouponsPayments>(couponModel);
-                await _db.Coupons.AddAsync(coupon);
+                var expense = _mapper.Map<ExpensesPayments>(expenseModel);
+                await _db.Expenses.AddAsync(expense);
                 await _db.SaveChangesAsync();
-                _response.Result = couponModel;
+                _response.Result = expenseModel;
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);
             }
@@ -82,13 +80,13 @@ namespace system_backend.Controllers.Agents
             }
             return _response;
         }
-        [HttpPut("UpdateCoupon")]
+        [HttpPut("UpdateExpense")]
         [Authorize(Roles = Roles.User_Role)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> UpdateCoupon(int id, [FromBody] CouponDTO updateDTO)
+        public async Task<ActionResult<ApiRespose>> UpdateExpense(int id, [FromBody] ExpenseDTO updateDTO)
         {
             try
             {
@@ -97,9 +95,9 @@ namespace system_backend.Controllers.Agents
                     return BadRequest();
                 }
 
-                var coupon = _mapper.Map<CouponsPayments>(updateDTO);
+                var expense = _mapper.Map<ExpensesPayments>(updateDTO);
 
-                _db.Coupons.Update(coupon);
+                _db.Expenses.Update(expense);
                 await _db.SaveChangesAsync();
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
@@ -113,12 +111,12 @@ namespace system_backend.Controllers.Agents
             }
             return _response;
         }
-        [HttpDelete("DeleteCoupon")]
+        [HttpDelete("DeleteExpense")]
         [Authorize(Roles = Roles.User_Role + "," + Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<ApiRespose>> DeleteCoupon(int id)
+        public async Task<ActionResult<ApiRespose>> DeleteExpense(int id)
         {
             try
             {
@@ -126,13 +124,13 @@ namespace system_backend.Controllers.Agents
                 {
                     return BadRequest();
                 }
-                var coupon = await _db.Coupons.FindAsync(id);
-                if (coupon == null)
+                var expense = await _db.Expenses.FindAsync(id);
+                if (expense == null)
                 {
                     return NotFound();
                 }
-                _db.Coupons.Remove(coupon);
-                 await _db.SaveChangesAsync();
+                _db.Expenses.Remove(expense);
+                await _db.SaveChangesAsync();
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
                 return Ok(_response);
@@ -145,6 +143,5 @@ namespace system_backend.Controllers.Agents
             }
             return _response;
         }
-
     }
 }

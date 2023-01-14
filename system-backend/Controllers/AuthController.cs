@@ -21,24 +21,7 @@ namespace system_backend.Controllers
             _db = db;
         }
 
-        [Authorize(Roles = Roles.Admin_Role)]
-        [HttpPost("CreateUser")]
-        public async Task<IActionResult> RegisterAsync([FromBody] RegisterModel model)
-        {
-            if(!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            var result = await _authServices.RegisterAsync(model);
-            if (!result.IsAuthenticated)
-            {
-                return BadRequest(result.Message);
-
-            }
-            _db.SaveChangesAsync();
-
-            return Ok(result);
-        }
+        
         [HttpPost("Login")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginModel model)
         {

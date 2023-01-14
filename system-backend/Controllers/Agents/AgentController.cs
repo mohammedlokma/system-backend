@@ -12,6 +12,8 @@ namespace system_backend.Controllers.Agents
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize(Roles = Roles.Admin_Role)]
+
     public class AgentController : ControllerBase
     {
         protected ApiRespose _response;
@@ -24,11 +26,12 @@ namespace system_backend.Controllers.Agents
             _unitOfWork = unit;
             _mapper = mapper;
             _response = new();
-        }
+        }       
         [HttpGet("GetAgents")]
-        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiRespose>> GetAgents()
         {
             try
@@ -51,10 +54,10 @@ namespace system_backend.Controllers.Agents
         }
 
         [HttpGet("GetAgent")]
-        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiRespose>> GetAgent(string id)
         {
             try
@@ -83,9 +86,9 @@ namespace system_backend.Controllers.Agents
             return _response;
         }
         [HttpPost("CreateAgent")]
-        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiRespose>> CreateAgent([FromBody] RegisterAgentModel agentModel)
         {
@@ -94,7 +97,7 @@ namespace system_backend.Controllers.Agents
 
                 if (agentModel == null)
                 {
-                    return BadRequest(agentModel);
+                    return BadRequest();
                 }
 
 
@@ -118,7 +121,9 @@ namespace system_backend.Controllers.Agents
 
         [HttpPut("UpdateAgent")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<ApiRespose>> UpdateAgent(string id, [FromBody] AgentUpdateDTO updateDTO)
         {
             try
@@ -146,37 +151,37 @@ namespace system_backend.Controllers.Agents
             return _response;
         }
 
-        //[ProducesResponseType(StatusCodes.Status204NoContent)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[HttpDelete("DeleteEmployee")]
-        //public async Task<ActionResult<ApiRespose>> DeleteEmployee(int id)
-        //{
-        //    try
-        //    {
-        //        if (id == 0)
-        //        {
-        //            return BadRequest();
-        //        }
-        //        var employee = await _unitOfWork.Employees.FindAsync(u => u.Id == id);
-        //        if (employee == null)
-        //        {
-        //            return NotFound();
-        //        }
-        //        await _unitOfWork.Employees.RemoveAsync(employee);
-        //        await _unitOfWork.SaveAsync();
-        //        _response.StatusCode = HttpStatusCode.NoContent;
-        //        _response.IsSuccess = true;
-        //        return Ok(_response);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        _response.IsSuccess = false;
-        //        _response.ErrorMessages
-        //             = new List<string>() { ex.ToString() };
-        //    }
-        //    return _response;
-        //}
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [HttpDelete("DeleteAgent")]
+        public async Task<ActionResult<ApiRespose>> DeleteAgent(string id)
+        {
+            try
+            {
+                if (id is null)
+                {
+                    return BadRequest();
+                }
+                var agent = await _unitOfWork.Agents.GetAsync(i => i.Id == id);
+                if (agent == null)
+                {
+                    return NotFound();
+                }
+                await _unitOfWork.Agents.DeleteAgentAsync(id);
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
 
     }
 }

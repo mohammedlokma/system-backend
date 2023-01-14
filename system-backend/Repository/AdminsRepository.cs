@@ -8,7 +8,7 @@ using system_backend.Repository.Interfaces;
 
 namespace system_backend.Repository
 {
-    public class AdminsRepository :IAdminsRepository
+    public class AdminsRepository : BaseRepository<ApplicationUser>,IAdminsRepository
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
@@ -17,7 +17,7 @@ namespace system_backend.Repository
 
         public AdminsRepository(ApplicationDbContext db, 
             UserManager<ApplicationUser> userManager,
-            RoleManager<IdentityRole> roleManager, IMapper mapper) 
+            RoleManager<IdentityRole> roleManager, IMapper mapper) :base(db)
         {
             _db = db;
             _userManager = userManager;

@@ -1,0 +1,13 @@
+admins---- GetAdmins,add,edit,delete>>> done
+servicePlaces---- GetServicePlaces,add,edit,delete>>> done
+coupons---- GetCoupons,add,edit,delete>>> done
+expense---- GetExpenses,add,edit,delete>>> done
+agent--- getAgents,GetAgent,add,update,delete>>> done
+------
+not done
+safe (inputs ,total,outputs)
+transactions:{
+withdraw cost form agent
+add cost for agent
+}
+company

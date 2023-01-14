@@ -11,15 +11,15 @@ using system_backend.Services;
 
 namespace system_backend.Repository
 {
-    public class AgentRepository: BaseRepository<Agent>,IAgentRepository
+    public class AgentRepository : BaseRepository<Agent>, IAgentRepository
     {
-       
+
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
         private IAuthServices _authServices;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AgentRepository(ApplicationDbContext db, 
+        public AgentRepository(ApplicationDbContext db,
             IMapper mapper, IAuthServices authServices, UserManager<ApplicationUser> userManager) : base(db)
         {
             _db = db;
@@ -41,7 +41,7 @@ namespace system_backend.Repository
                     return user;
                 }
                 model.Id = user.UserId;
-               
+
                 var agent = _mapper.Map<Agent>(model);
                 foreach (var place in agent.ServicePlaces)
                 {
@@ -53,7 +53,7 @@ namespace system_backend.Repository
                 await _db.Agents.AddAsync(agent);
                 _db.SaveChanges();
                 transaction.Commit();
-               
+
                 return new AuthModel
                 {
                     UserId = agent.Id,
@@ -68,35 +68,35 @@ namespace system_backend.Repository
             catch (Exception ex)
             {
                 transaction.Rollback();
-                
+
                 return new AuthModel { Message = ex.ToString() };
-           
+
             }
-                
+
         }
         public async Task<List<AgentDTO>> GetAgentsAsync()
         {
 
             var users = _userManager.Users;
             var agents = await (from user in _db.Users
-                                                         join userRole in _db.UserRoles
-                                                         on user.Id equals userRole.UserId
-                                                         join role in _db.Roles
-                                                         on userRole.RoleId equals role.Id
-                                                         where role.Name == "User"
-                                                         join agent in _db.Agents
-                                                         on user.Id equals agent.Id 
-                                                        
-                                                         select new AgentDTO
-                                                         {
-                                                            Id = agent.Id,
-                                                             UserDisplayName = user.UserDisplayName,
-                                                             UserName = user.UserName,
-                                                             ServicePlaces = (from a in _db.AgentServicePlaces
-                                                                             join s in _db.ServicePlaces on a.ServicePlacesId equals s.Id
-                                                                             where a.AgentId == user.Id
-                                                                             select s.Name).ToList()
-                                                         }
+                                join userRole in _db.UserRoles
+                                on user.Id equals userRole.UserId
+                                join role in _db.Roles
+                                on userRole.RoleId equals role.Id
+                                where role.Name == "User"
+                                join agent in _db.Agents
+                                on user.Id equals agent.Id
+
+                                select new AgentDTO
+                                {
+                                    Id = agent.Id,
+                                    UserDisplayName = user.UserDisplayName,
+                                    UserName = user.UserName,
+                                    ServicePlaces = (from a in _db.AgentServicePlaces
+                                                     join s in _db.ServicePlaces on a.ServicePlacesId equals s.Id
+                                                     where a.AgentId == user.Id
+                                                     select s.Name).ToList()
+                                }
                                                          )
 
                    .ToListAsync();
@@ -137,6 +137,22 @@ namespace system_backend.Repository
             }
         }
 
-
+        public async Task DeleteAgentAsync(string id)
+        {
+            var transaction = _db.Database.BeginTransaction();
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                await _userManager.DeleteAsync(user);
+                var agent = await _db.Agents.FindAsync(id);
+                 _db.Agents.Remove(agent);
+                await _db.SaveChangesAsync();
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Rollback();
+            }
+        }
     }
 }

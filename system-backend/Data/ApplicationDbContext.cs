@@ -14,9 +14,13 @@ namespace system_backend.Data
 
         public DbSet<ServicePlaces> ServicePlaces { get; set; }
         public DbSet<AgentServicePlaces> AgentServicePlaces { get; set; }
-
         public DbSet<ExpensesPayments> Expenses { get; set; }
         public DbSet<CouponsPayments> Coupons { get; set; }
+        public DbSet<Safe> Safe { get; set; }
+        public DbSet<SafeInputs> SafeInputs { get; set; }
+        public DbSet<SafeOutputs> SafeOutputs { get; set; }
+
+
 
 
     }
