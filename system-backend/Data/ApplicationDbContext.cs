@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using System.Reflection.Metadata;
 using system_backend.Models;
 
@@ -12,10 +13,10 @@ namespace system_backend.Data
         }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+           
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Entity<Safe>()
-                .Property(b => b.Total)
-                .HasDefaultValue(5);
+            modelBuilder.Entity<Safe>().HasData(
+            new Safe { Id=1,Total=0.0});
         }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Agent> Agents { get; set; }

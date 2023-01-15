@@ -2,8 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using System.Net;
 using system_backend.Const;
+using system_backend.Data;
 using system_backend.Models;
 using system_backend.Models.Dtos;
 using system_backend.Repository.Interfaces;
@@ -19,12 +22,14 @@ namespace system_backend.Controllers.Agents
         protected ApiRespose _response;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private ApplicationDbContext _db;
 
 
-        public AgentController(IUnitOfWork unit, IMapper mapper)
+        public AgentController(IUnitOfWork unit, IMapper mapper,ApplicationDbContext db)
         {
             _unitOfWork = unit;
             _mapper = mapper;
+            _db = db;
             _response = new();
         }       
         [HttpGet("GetAgents")]
@@ -182,6 +187,97 @@ namespace system_backend.Controllers.Agents
             }
             return _response;
         }
+        [HttpPost("AddCostToAgent")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> AddCostToAgent(string id, float value)
+        {
+            try
+            {
 
+                if (value == 0 || id is null)
+                {
+                    return BadRequest();
+                }
+
+                var transaction = _db.Database.BeginTransaction();
+                try
+                {
+                    var total = await _db.Safe.AsNoTracking().FirstOrDefaultAsync();
+                    if(value > total.Total)
+                    {
+                        _response.ErrorMessages
+                     = new List<string>() { "الخزنة لا يتوافر بها هذه القيمه" };
+                        return _response;
+
+                    }
+                    var newValue = new Safe() { Id = total.Id, Total = total.Total - value };
+                    _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
+                    var agent = await _unitOfWork.Agents.GetAsync(i=>i.Id== id);
+                    agent.custody += value;
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                _response.StatusCode = HttpStatusCode.Created;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+        [HttpPost("WithDrawCostFromAgent")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> WithDrawCostFromAgent(string id)
+        {
+            try
+            {
+
+                if ( id is null)
+                {
+                    return BadRequest();
+                }
+
+                var transaction = _db.Database.BeginTransaction();
+                try
+                {
+                    var total = await _db.Safe.AsNoTracking().FirstOrDefaultAsync();
+                    var agent = await _unitOfWork.Agents.GetAsync(i => i.Id == id);
+
+                    var newValue = new Safe() { Id = total.Id, Total = total.Total + agent.custody };
+                    _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
+                    agent.custody =0;
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
+                _response.StatusCode = HttpStatusCode.Created;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
     }
 }
