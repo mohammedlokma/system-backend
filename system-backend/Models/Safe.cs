@@ -1,7 +1,11 @@
-﻿namespace system_backend.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace system_backend.Models
 {
     public class Safe
     {
-        public double Total { get; set; } = 0;
+        [Key]
+        public int Id { get; set; }
+        public double Total { get; set; }
     }
 }

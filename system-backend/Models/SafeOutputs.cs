@@ -1,4 +1,6 @@
-﻿namespace system_backend.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace system_backend.Models
 {
     public class SafeOutputs
     {

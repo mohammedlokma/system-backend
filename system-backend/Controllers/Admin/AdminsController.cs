@@ -15,7 +15,7 @@ using system_backend.Services;
 
 namespace system_backend.Controllers.Admin
 {
-    [Authorize(Roles = Roles.Admin_Role)]
+   [Authorize(Roles = Roles.Admin_Role)]
     [Route("api/[controller]")]
     [ApiController]
     public class AdminsController : ControllerBase

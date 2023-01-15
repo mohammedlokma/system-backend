@@ -34,12 +34,12 @@ namespace system_backend.Controllers.Agents
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> GetCoupons(string id)
+        public async Task<ActionResult<ApiRespose>> GetCoupons(string id, DateTime startDate, DateTime endDate)
         {
             try
             {
 
-                var coupons = await _db.Coupons.Where(i=>i.AgentId == id).ToListAsync();
+                var coupons = await _db.Coupons.Where(i=>i.AgentId == id && i.Date >= startDate && i.Date < endDate).ToListAsync();
                 _response.Result = _mapper.Map<List<CouponDTO>>(coupons);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response.Result);
@@ -64,7 +64,7 @@ namespace system_backend.Controllers.Agents
 
                 if (couponModel == null)
                 {
-                    return BadRequest(couponModel);
+                    return BadRequest();
                 }
 
                 var coupon = _mapper.Map<CouponsPayments>(couponModel);

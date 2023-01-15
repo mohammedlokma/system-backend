@@ -32,12 +32,12 @@ namespace system_backend.Controllers.Agents
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> GetExpenses(string id)
+        public async Task<ActionResult<ApiRespose>> GetExpenses(string id,DateTime startDate, DateTime endDate)
         {
             try
             {
 
-                var expenses = await _db.Expenses.Where(i=>i.AgentId == id).ToListAsync();
+                var expenses = await _db.Expenses.Where(i=>i.AgentId == id && i.Date >= startDate && i.Date < endDate).ToListAsync();
                 _response.Result = _mapper.Map<List<ExpenseDTO>>(expenses);
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response.Result);
@@ -62,7 +62,7 @@ namespace system_backend.Controllers.Agents
 
                 if (expenseModel == null)
                 {
-                    return BadRequest(expenseModel);
+                    return BadRequest();
                 }
 
                 var expense = _mapper.Map<ExpensesPayments>(expenseModel);
