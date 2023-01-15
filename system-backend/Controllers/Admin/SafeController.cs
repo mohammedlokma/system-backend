@@ -13,7 +13,7 @@ namespace system_backend.Controllers.Admin
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Roles.User_Role + "," + Roles.Admin_Role)]
+    [Authorize(Roles = Roles.Admin_Role)]
     public class SafeController : ControllerBase
     {
         protected ApiRespose _response;
