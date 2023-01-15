@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -88,6 +90,7 @@ namespace system_backend.Services
 
             return authModel;
         }
+       
 
        
 
@@ -123,5 +126,26 @@ namespace system_backend.Services
 
             return jwtSecurityToken;
         }
+
+        public async Task<ApplicationUser> ResetPasswordAsync(PasswordResetDto passwordResetDto)
+        {
+            var user = await _userManager.FindByIdAsync(passwordResetDto.userId);
+            if (user == null)
+                return null;
+
+          
+            if (passwordResetDto.NewPassword != passwordResetDto.ConfirmPassword)
+                return null;
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, code, passwordResetDto.NewPassword);
+
+            if (result.Succeeded)
+                return user;
+
+            return null;
         }
+
+        
+
+    }
 }

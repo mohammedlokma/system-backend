@@ -35,7 +35,7 @@ builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
 //Auth
 builder.Services.Configure<JWT>(builder.Configuration.GetSection("JWT"));
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders(); 
 
 builder.Services.AddScoped<IAuthServices, AuthServices>();
 builder.Services.AddAuthentication(options =>
