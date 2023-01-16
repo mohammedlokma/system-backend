@@ -1,4 +1,7 @@
-﻿namespace system_backend.Models
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace system_backend.Models
 {
     public class CompanyReportItems
     {

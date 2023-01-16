@@ -1,11 +1,16 @@
-admins---- GetAdmins,add,edit,delete>>> done
+admins---- GetAdmins,add,edit,delete,ResetPassword>>> done
 servicePlaces---- GetServicePlaces,add,edit,delete>>> done
 coupons---- GetCoupons,add,edit,delete>>> done
 expense---- GetExpenses,add,edit,delete>>> done
 agent--- GetAgents,GetAgent,add,update,delete,AddCostToAgent,WithDrawFromAgent>>> done
 safe--- GetInputs,GetTotal,GetOutputs,AddSafeInputs,AddSafeOutputs>>> done
-------
+company--- GetCompanies,GetCompany,UpdateCompany,DeleteCompany,AddToAccount,AddPayment,DeletePayment,AddBill,DeleteBill>>> done
+---------------------
 not done
-company
+bills details
+return full object of agent,company
 excel reports
 big report
+pagination
+-------------------
+are payments and bills of company reflect to safe or not ? 

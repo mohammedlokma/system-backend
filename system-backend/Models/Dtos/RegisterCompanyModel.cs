@@ -2,7 +2,7 @@
 
 namespace system_backend.Models.Dtos
 {
-    public class RegisterAgentModel
+    public class RegisterCompanyModel
     {
         public string? Id { get; set; }
         [Required, StringLength(100)]
@@ -14,7 +14,6 @@ namespace system_backend.Models.Dtos
         [Required, StringLength(256)]
         public string Password { get; set; }
         [Required]
-        public string Role { get; set; } = "User";
-        public List<ServicePlacesDTO> ServicePlaces { get; set; } = new List<ServicePlacesDTO>();
+        public string Role { get; set; } = "Company";
     }
 }

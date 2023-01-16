@@ -28,6 +28,14 @@ namespace system_backend.Data
         public DbSet<Safe> Safe { get; set; }
         public DbSet<SafeInputs> SafeInputs { get; set; }
         public DbSet<SafeOutputs> SafeOutputs { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<Bills> Bills { get; set; }
+        public DbSet<ReportItems> ReportItems { get; set; }
+        public DbSet<CompanyReportItems> CompanyReportItems { get; set; }
+        public DbSet<CompanyPayments> CompanyPayments { get; set; }
+        public DbSet<BillDetails> BillDetails { get; set; }
+
+        public DbSet<FullReport> FullReport { get; set; }
 
 
 

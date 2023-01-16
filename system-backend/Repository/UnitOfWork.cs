@@ -30,9 +30,12 @@ namespace system_backend.Repository
             _roleManager, _mapper);
             Agents = new AgentRepository(_db, _mapper, _authServices, _userManager
             );
+            Companies = new CompanyRepository(_db, _mapper, _authServices, _userManager
+           );
         }
         public IAdminsRepository Admins { get; private set; }
         public IAgentRepository Agents { get; private set; }
+        public ICompanyRepository Companies { get; private set; }
         public async Task SaveAsync()
         {
             await _db.SaveChangesAsync();

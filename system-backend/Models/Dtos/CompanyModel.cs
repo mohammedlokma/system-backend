@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace system_backend.Models
+﻿namespace system_backend.Models.Dtos
 {
-    public class Company
+    public class CompanyModel
     {
-        [Key]
         public string Id { get; set; }
-        public ICollection<CompanyReportItems> reportItems { get; set; }
+        public string UserName { get; set; }
+        public string UserDisplayName { get; set; }
         public double Account { get; set; }
         public ICollection<CompanyPayments> Payments { get; set; }
         public ICollection<Bills> Bills { get; set; }

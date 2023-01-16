@@ -22,6 +22,15 @@ namespace system_backend
             CreateMap<CouponsPayments, CouponDTO>().ReverseMap();
             CreateMap<ExpensesPayments, ExpenseDTO>().ReverseMap();
 
+            CreateMap<RegisterCompanyModel, ApplicationUser>().ReverseMap();
+            CreateMap<RegisterModel, RegisterCompanyModel>().ReverseMap();
+            CreateMap<RegisterCompanyModel, Company>().ReverseMap();
+            CreateMap<Company, CompanyModel>().ReverseMap();
+            CreateMap<Company, CompanyDTO>().ReverseMap();
+            CreateMap<Company, CompanyUpdateModel>().ReverseMap();
+            CreateMap<CompanyPayments, PaymentsDTO>().ReverseMap();
+            CreateMap<Bills, BillsDTO>().ReverseMap();
+
         }
     }
 }

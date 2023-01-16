@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using system_backend.Data;
 
@@ -11,9 +12,10 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230116093349_add-company")]
+    partial class addcompany
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -687,7 +689,7 @@ namespace system_backend.Migrations
             modelBuilder.Entity("system_backend.Models.Bills", b =>
                 {
                     b.HasOne("system_backend.Models.Company", "Company")
-                        .WithMany("Bills")
+                        .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -705,7 +707,7 @@ namespace system_backend.Migrations
             modelBuilder.Entity("system_backend.Models.CompanyPayments", b =>
                 {
                     b.HasOne("system_backend.Models.Company", "Company")
-                        .WithMany("Payments")
+                        .WithMany()
                         .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -770,10 +772,6 @@ namespace system_backend.Migrations
 
             modelBuilder.Entity("system_backend.Models.Company", b =>
                 {
-                    b.Navigation("Bills");
-
-                    b.Navigation("Payments");
-
                     b.Navigation("reportItems");
                 });
 

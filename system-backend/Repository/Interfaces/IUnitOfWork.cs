@@ -4,6 +4,7 @@
     {
         IAdminsRepository Admins { get; }
         IAgentRepository Agents { get; }
+        ICompanyRepository Companies { get; }
         Task SaveAsync();
 
     }
