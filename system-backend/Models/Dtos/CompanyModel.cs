@@ -6,7 +6,7 @@
         public string UserName { get; set; }
         public string UserDisplayName { get; set; }
         public double Account { get; set; }
-        public ICollection<CompanyPayments> Payments { get; set; }
-        public ICollection<Bills> Bills { get; set; }
+        public ICollection<PaymentsDTO> Payments { get; set; }
+        public ICollection<BillsDTO> Bills { get; set; }
     }
 }

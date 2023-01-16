@@ -31,6 +31,7 @@ namespace system_backend
             CreateMap<CompanyPayments, PaymentsDTO>().ReverseMap();
             CreateMap<Bills, BillsDTO>().ReverseMap();
 
+            CreateMap<ReportItems, ReportItemsDTO>().ReverseMap();
         }
     }
 }

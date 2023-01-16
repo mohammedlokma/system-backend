@@ -6,7 +6,7 @@ namespace system_backend.Models
     {
         [Key]
         public string Id { get; set; }
-        public ICollection<CompanyReportItems> reportItems { get; set; }
+        public ICollection<CompanyReportItems> ReportItems { get; set; }
         public double Account { get; set; }
         public ICollection<CompanyPayments> Payments { get; set; }
         public ICollection<Bills> Bills { get; set; }

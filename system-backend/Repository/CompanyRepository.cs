@@ -100,22 +100,23 @@ namespace system_backend.Repository
 
             //var user = await _userManager.Users.FirstOrDefaultAsync(x => x.Id == id);
 
-            var companyModel = (from user in _db.Users
+            var companyModel = await (from user in _db.Users
+                                where user.Id == id
                                 join company in _db.Companies
-                                 on user.Id equals company.Id
-                                join payment in _db.CompanyPayments on user.Id equals payment.CompanyId
-                            join bill in _db.Bills on user.Id equals bill.CompanyId
-                            where user.Id == id
-                            select new CompanyModel
-                            {
+                                 on id equals company.Id
+                                select new CompanyModel
+                                {
 
-                                Id = user.Id,
-                                UserName = user.UserName,
-                                UserDisplayName = user.UserDisplayName,
-                                Account = company.Account,
-                                Payments = company.Payments,
-                                Bills = company.Bills,
-                            });
+                                    Id = user.Id,
+                                    UserName = user.UserName,
+                                    UserDisplayName = user.UserDisplayName,
+                                    Account = company.Account,
+                                    Payments = 
+                                    _mapper.Map<List<PaymentsDTO>>
+                                    (_db.CompanyPayments.Where(i=>i.CompanyId == id).ToList()),
+                                    Bills = _mapper.Map<List<BillsDTO>>
+                                    (_db.Bills.Where(i => i.CompanyId == id).ToList()),
+                                }).FirstOrDefaultAsync();
 
             var companyDTO = _mapper.Map<CompanyModel>(companyModel);
             return companyDTO;

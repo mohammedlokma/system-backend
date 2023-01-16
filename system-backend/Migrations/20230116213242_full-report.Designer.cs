@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using system_backend.Data;
 
@@ -11,9 +12,10 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230116213242_full-report")]
+    partial class fullreport
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -380,11 +382,14 @@ namespace system_backend.Migrations
                     b.Property<int>("ReportItemId")
                         .HasColumnType("int");
 
+                    b.Property<int>("ReportItemsId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
 
-                    b.HasIndex("ReportItemId");
+                    b.HasIndex("ReportItemsId");
 
                     b.ToTable("CompanyReportItems");
                 });
@@ -718,15 +723,15 @@ namespace system_backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("system_backend.Models.ReportItems", "ReportItem")
+                    b.HasOne("system_backend.Models.ReportItems", "ReportItems")
                         .WithMany()
-                        .HasForeignKey("ReportItemId")
+                        .HasForeignKey("ReportItemsId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
 
-                    b.Navigation("ReportItem");
+                    b.Navigation("ReportItems");
                 });
 
             modelBuilder.Entity("system_backend.Models.CouponsPayments", b =>

@@ -12,6 +12,6 @@ namespace system_backend.Models
         public Company Company { get; set; }
         [ForeignKey("ReportItemId")]
         public int ReportItemId { get; set; }
-        public ReportItems ReportItems { get; set; }
+        public ReportItems ReportItem { get; set; }
     }
 }

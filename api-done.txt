@@ -5,12 +5,12 @@ expense---- GetExpenses,add,edit,delete>>> done
 agent--- GetAgents,GetAgent,add,update,delete,AddCostToAgent,WithDrawFromAgent>>> done
 safe--- GetInputs,GetTotal,GetOutputs,AddSafeInputs,AddSafeOutputs>>> done
 company--- GetCompanies,GetCompany,UpdateCompany,DeleteCompany,AddToAccount,AddPayment,DeletePayment,AddBill,DeleteBill>>> done
+fullReport--- GetReportItems,CreateReportItem,DeleteReportItem,AddReportItemToCompany,GetCompanyReportItems>>> done
 ---------------------
 not done
 bills details
-return full object of agent,company
 excel reports
-big report
+FullReport
 pagination
 -------------------
 are payments and bills of company reflect to safe or not ? 

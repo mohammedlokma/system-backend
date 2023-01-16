@@ -72,13 +72,13 @@ namespace system_backend.Controllers.Agents
                     _response.StatusCode = HttpStatusCode.BadRequest;
                     return BadRequest(_response);
                 }
-                var agent = await _unitOfWork.Agents.GetAsync(u => u.Id == id, includeProperties: "Expenses,Coupons");
+                var agent = await _unitOfWork.Agents.GetAgentAsync(id);
                 if (agent == null)
                 {
                     _response.StatusCode = HttpStatusCode.NotFound;
                     return NotFound(_response);
                 }
-                _response.Result = _mapper.Map<AgentModel>(agent);
+                _response.Result = agent;
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response.Result);
             }

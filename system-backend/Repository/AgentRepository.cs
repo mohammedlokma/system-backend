@@ -105,6 +105,36 @@ namespace system_backend.Repository
             return agentsDTO;
 
         }
+        public async Task<AgentModel> GetAgentAsync(string id)
+        {
+
+
+            var agentModel = await (from user in _db.Users
+                                      where user.Id == id
+                                      join agent in _db.Agents
+                                       on id equals agent.Id
+                                      select new AgentModel
+                                      {
+
+                                          Id = user.Id,
+                                          UserName = user.UserName,
+                                          UserDisplayName = user.UserDisplayName,
+                                          custody = agent.custody,
+                                          Coupons =
+                                          _mapper.Map<List<CouponDTO>>
+                                          (_db.Coupons.Where(i => i.AgentId == id).ToList()),
+                                          Expenses = _mapper.Map<List<ExpenseDTO>>
+                                          (_db.Expenses.Where(i => i.AgentId == id).ToList()),
+                                          ServicePlaces = (from a in _db.AgentServicePlaces
+                                                           join s in _db.ServicePlaces on a.ServicePlacesId equals s.Id
+                                                           where a.AgentId == user.Id
+                                                           select s.Name).ToList(), 
+                                      }).FirstOrDefaultAsync();
+
+            var agentDTO = _mapper.Map<AgentModel>(agentModel);
+            return agentDTO;
+
+        }
         public async Task<AgentUpdateDTO> UpdateAsync(AgentUpdateDTO agentDTO)
         {
             var transaction = _db.Database.BeginTransaction();
