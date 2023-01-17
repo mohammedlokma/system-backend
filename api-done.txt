@@ -5,11 +5,12 @@ expense---- GetExpenses,add,edit,delete>>> done
 agent--- GetAgents,GetAgent,add,update,delete,AddCostToAgent,WithDrawFromAgent>>> done
 safe--- GetInputs,GetTotal,GetOutputs,AddSafeInputs,AddSafeOutputs>>> done
 company--- GetCompanies,GetCompany,UpdateCompany,DeleteCompany,AddToAccount,AddPayment,DeletePayment,AddBill,DeleteBill>>> done
-fullReport--- GetReportItems,CreateReportItem,DeleteReportItem,AddReportItemToCompany,GetCompanyReportItems>>> done
+fullReport--- GetReportItems,CreateReportItem(AddColumnInFullReport),DeleteReportItem,AddReportItemToCompany,GetCompanyReportItems>>> done
 ---------------------
 not done
 bills details
 excel reports
+DeleteReportItem(DropColumnFromFulReport)
 FullReport(add-row,add-agent-comment,add-company-comment)
 pagination
 -------------------

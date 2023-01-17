@@ -88,16 +88,11 @@ namespace system_backend.Controllers.Report
                     {
                         using (SqlCommand cmd = new SqlCommand(queryString, connection))
                         {
-                            cmd.Connection = connection;
                             connection.Open();
                             cmd.ExecuteNonQuery();
                             connection.Close();
                         }
-                        
-                        //connection.Open();
-                        //command.ExecuteNonQuery();
-
-
+   
                     }
                     await _db.SaveChangesAsync();
                     transaction.Commit();
@@ -139,8 +134,33 @@ namespace system_backend.Controllers.Report
                 {
                     return NotFound();
                 }
-                _db.ReportItems.Remove(item);
-                await _db.SaveChangesAsync();
+                var transaction = _db.Database.BeginTransaction();
+                try
+                {
+                    _db.ReportItems.Remove(item);
+
+                    var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                    string queryString =
+                        "ALTER TABLE FullReport DROP COLUMN " + item.Name + ";";
+                    using (SqlConnection connection = new SqlConnection(
+                               connectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand(queryString, connection))
+                        {
+                            connection.Open();
+                            cmd.ExecuteNonQuery();
+                            connection.Close();
+                        }
+                    }
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+
+                    transaction.Rollback();
+                }
+               
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;
                 return Ok(_response);
