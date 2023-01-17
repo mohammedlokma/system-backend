@@ -10,7 +10,7 @@ fullReport--- GetReportItems,CreateReportItem,DeleteReportItem,AddReportItemToCo
 not done
 bills details
 excel reports
-FullReport
+FullReport(add-row,add-agent-comment,add-company-comment)
 pagination
 -------------------
 are payments and bills of company reflect to safe or not ? 

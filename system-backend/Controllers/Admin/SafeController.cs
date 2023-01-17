@@ -119,7 +119,7 @@ namespace system_backend.Controllers.Admin
                 catch (Exception)
                 {
 
-                    throw;
+                    transaction.Rollback();
                 }
                 
                 _response.StatusCode = HttpStatusCode.Created;
@@ -158,7 +158,7 @@ namespace system_backend.Controllers.Admin
                 catch (Exception)
                 {
 
-                    throw;
+                    transaction.Rollback();
                 }
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);

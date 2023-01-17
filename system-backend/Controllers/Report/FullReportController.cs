@@ -3,7 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
+using System.Drawing;
 using System.Net;
 using system_backend.Const;
 using system_backend.Data;
@@ -23,12 +28,14 @@ namespace system_backend.Controllers.Report
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ApplicationDbContext _db;
-        public FullReportController( IUnitOfWork unitOfWork, IMapper mapper, ApplicationDbContext db)
+        private readonly IConfiguration _configuration;
+        public FullReportController( IUnitOfWork unitOfWork, IMapper mapper, ApplicationDbContext db,IConfiguration configuration)
         {
             _response = new();
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _db = db;
+            _configuration = configuration;
         }
         [HttpGet("GetReportItems")]
         [Authorize(Roles = Roles.Admin_Role)]
@@ -68,10 +75,40 @@ namespace system_backend.Controllers.Report
                 {
                     return BadRequest();
                 }
+                var transaction = _db.Database.BeginTransaction();
+                try
+                {
+                    var item = _mapper.Map<ReportItems>(itemModel);
+                    await _db.ReportItems.AddAsync(item);
+                    var connectionString = _configuration.GetConnectionString("DefaultConnection");
+                    string queryString =
+                        "ALTER TABLE FullReport ADD " + item.Name + " varchar(255) DEFAULT NULL;";
+                    using (SqlConnection connection = new SqlConnection(
+                               connectionString))
+                    {
+                        using (SqlCommand cmd = new SqlCommand(queryString, connection))
+                        {
+                            cmd.Connection = connection;
+                            connection.Open();
+                            cmd.ExecuteNonQuery();
+                            connection.Close();
+                        }
+                        
+                        //connection.Open();
+                        //command.ExecuteNonQuery();
 
-                var item = _mapper.Map<ReportItems>(itemModel);
-                await _db.ReportItems.AddAsync(item);
-                await _db.SaveChangesAsync();
+
+                    }
+                    await _db.SaveChangesAsync();
+                    transaction.Commit();
+                }
+                catch (Exception)
+                {
+
+                    transaction.Rollback();
+                }
+
+                
                 _response.Result = itemModel;
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);
