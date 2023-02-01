@@ -2,6 +2,7 @@
 {
     public class ServicePlacesCreateDTO
     {
+
         public string Name { get; set; }
     }
 }

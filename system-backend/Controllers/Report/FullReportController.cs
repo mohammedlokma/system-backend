@@ -5,10 +5,15 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Text.Json;
+using System.Web;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
+using System.Dynamic;
 using System.Net;
 using system_backend.Const;
 using system_backend.Data;
@@ -16,6 +21,7 @@ using system_backend.Models;
 using system_backend.Models.Dtos;
 using system_backend.Repository.Interfaces;
 using system_backend.Services;
+
 using static Microsoft.AspNetCore.Razor.Language.TagHelperMetadata;
 
 namespace system_backend.Controllers.Report
@@ -82,7 +88,8 @@ namespace system_backend.Controllers.Report
                     await _db.ReportItems.AddAsync(item);
                     var connectionString = _configuration.GetConnectionString("DefaultConnection");
                     string queryString =
-                        "ALTER TABLE FullReport ADD " + item.Name + " varchar(255) DEFAULT NULL;";
+                        "ALTER TABLE FullReport ADD " + item.Name +
+                        " varchar(255);";
                     using (SqlConnection connection = new SqlConnection(
                                connectionString))
                     {
@@ -235,6 +242,80 @@ namespace system_backend.Controllers.Report
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response.Result);
             }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+        [HttpPost("AddRow")]
+        [Authorize(Roles = Roles.Admin_Role)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> AddRow([FromBody] Dictionary<string,string> jsonObject )
+        {
+            try
+            {
+
+                if (jsonObject == null)
+                {
+                    return BadRequest();
+                }
+
+                //var s = System.Text.Json.JsonSerializer.Serialize(jsonObject.ToString());
+                //var d = jsonObject.row;
+                //string c = JsonConvert.DeserializeObject(jsonObject,typeof(ExpandoObject));
+                //string jsonResponse = jsonObject.ToString().Trim().TrimStart('{').TrimEnd('}');
+                //var data2 = JsonConvert.DeserializeObject<string>(d.ToString());    
+                //var data = JsonConvert.DeserializeObject<dynamic>(s);
+                // var data2 = JsonConvert.DeserializeObject<dynamic>(data.ToString());
+
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                var query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='FullReport'";
+
+                SqlConnection connection = new SqlConnection(connectionString);
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                connection.Open();
+                da.Fill(dt);
+                var columns = dt.AsEnumerable().Select(i => i.ItemArray).ToList();
+
+              
+                var keys = "";
+                var vals = "";
+                for (int i = 0; i < columns.Count; ++i)
+                {
+                    if(jsonObject.ContainsKey(columns[i][0].ToString()))
+                    {
+                        keys += columns[i][0].ToString();
+                        if (i < columns.Count - 1) keys += ",";
+                        vals += "'";
+                        vals += jsonObject[columns[i][0].ToString()];
+                        vals += "'";
+                        if (i < columns.Count - 1) vals += ",";
+                    }
+                }
+                
+
+                string queryString =
+                   "INSERT INTO FullReport (" + keys + ") VALUES(" + vals + ");";
+
+                SqlCommand cmd2 = new SqlCommand(queryString, connection);
+                cmd2.ExecuteNonQuery();
+                connection.Close();
+                // await _db.SaveChangesAsync();
+                _response.Result = jsonObject;
+                _response.StatusCode = HttpStatusCode.Created;
+                return Ok(_response.Result);
+            }
+
             catch (Exception ex)
             {
                 _response.IsSuccess = false;

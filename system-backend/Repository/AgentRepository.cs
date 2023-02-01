@@ -105,6 +105,39 @@ namespace system_backend.Repository
             return agentsDTO;
 
         }
+        public async Task<List<AgentDTO>> GetAgentPlacesAsync(int id)
+        {
+
+            var users = _userManager.Users;
+            var agents = await (from user in _db.Users
+                                join userRole in _db.UserRoles
+                                on user.Id equals userRole.UserId
+                                join role in _db.Roles
+                                on userRole.RoleId equals role.Id
+                                where role.Name == "User"
+                                join agent in _db.Agents
+                                on user.Id equals agent.Id
+                                join place in _db.AgentServicePlaces
+                                on agent.Id equals place.AgentId
+                                where place.ServicePlacesId == id
+                                select new AgentDTO
+                                {
+                                    Id = agent.Id,
+                                    UserDisplayName = user.UserDisplayName,
+                                    UserName = user.UserName,
+                                    ServicePlaces = (from a in _db.AgentServicePlaces
+                                                     join s in _db.ServicePlaces on a.ServicePlacesId equals s.Id
+                                                     where a.AgentId == user.Id
+                                                     select s.Name).ToList()
+                                }
+                                                         )
+
+                   .ToListAsync();
+
+            var agentsDTO = _mapper.Map<List<AgentDTO>>(agents);
+            return agentsDTO;
+
+        }
         public async Task<AgentModel> GetAgentAsync(string id)
         {
 
@@ -122,9 +155,12 @@ namespace system_backend.Repository
                                           custody = agent.custody,
                                           Coupons =
                                           _mapper.Map<List<CouponDTO>>
-                                          (_db.Coupons.Where(i => i.AgentId == id).ToList()),
+                                          (_db.Coupons.Where(i => i.AgentId == id)
+                                          .OrderByDescending(i => i.Id).Take(10).ToList()),
+
                                           Expenses = _mapper.Map<List<ExpenseDTO>>
-                                          (_db.Expenses.Where(i => i.AgentId == id).ToList()),
+                                          (_db.Expenses.Where(i => i.AgentId == id)
+                                          .OrderByDescending(i=>i.Id).Take(10).ToList()),
                                           ServicePlaces = (from a in _db.AgentServicePlaces
                                                            join s in _db.ServicePlaces on a.ServicePlacesId equals s.Id
                                                            where a.AgentId == user.Id

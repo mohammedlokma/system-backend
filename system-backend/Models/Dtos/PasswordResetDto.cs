@@ -4,8 +4,7 @@ namespace system_backend.Models.Dtos
 {
     public class PasswordResetDto
     {
-        [Required]
-        public string Token { get; set; }
+        
         [Required]
         public string userId { get; set; }
         [Required]

@@ -38,6 +38,7 @@ namespace system_backend.Controllers.Admin
         }
         [HttpPost("CreateAdmin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> CreateAdmin([FromBody] RegisterModel model)
@@ -154,9 +155,39 @@ namespace system_backend.Controllers.Admin
         {
             try
             {
+               
+                var places = await (from place in _db.ServicePlaces
+                                    select new GetServicePlacesDTO
+                                    {
+                                        Id = place.Id,
+                                        Name = place.Name,
+                                        NumOfAgents = _db.AgentServicePlaces.Where(i=>i.ServicePlacesId == place.Id).Count()
 
-                var places = await _db.ServicePlaces.ToListAsync();
-                _response.Result = _mapper.Map<List<ServicePlacesCreateDTO>>(places);
+                                    }
+                             ).ToListAsync();
+                _response.Result = places;
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+        [HttpGet("GetAgentServicePlaces")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> GetAgentServicePlaces(int id)
+        {
+            try
+            {
+                IEnumerable<AgentDTO> agents = await _unitOfWork.Agents.GetAgentPlacesAsync(id);
+                _response.Result = agents;
                 _response.StatusCode = HttpStatusCode.OK;
                 return Ok(_response.Result);
             }

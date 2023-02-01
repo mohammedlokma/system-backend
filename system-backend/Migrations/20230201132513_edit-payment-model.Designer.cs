@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using system_backend.Data;
 
@@ -11,9 +12,10 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230201132513_edit-payment-model")]
+    partial class editpaymentmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -475,7 +477,7 @@ namespace system_backend.Migrations
                     b.Property<string>("CompanyComment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ReleaseDate")
+                    b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("ReleaseStatus")

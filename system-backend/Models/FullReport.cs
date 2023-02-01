@@ -9,6 +9,6 @@ namespace system_backend.Models
         public string? CompanyComment { get; set; }
         public string? AgentComment { get; set; }
         public bool ReleaseStatus { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public DateTime? ReleaseDate { get; set; }
     }
 }

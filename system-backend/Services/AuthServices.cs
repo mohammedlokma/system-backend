@@ -102,12 +102,12 @@ namespace system_backend.Services
 
             foreach (var role in roles)
                 roleClaims.Add(new Claim("roles", role));
-            var iat= new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+            var iat= new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
             var claims = new[]
             {
                new Claim("userName", user.UserName),
                new Claim("userId", user.Id),
-               new Claim(JwtRegisteredClaimNames.Iat, iat)
+               new Claim(JwtRegisteredClaimNames.Iat, iat.ToString())
 
             }
             .Union(userClaims)
@@ -116,7 +116,6 @@ namespace system_backend.Services
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: _jwt.Issuer,
                 audience: _jwt.Audience,

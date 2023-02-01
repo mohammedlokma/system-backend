@@ -183,54 +183,6 @@ namespace system_backend.Controllers.Company
             }
             return _response;
         }
-        [HttpPost("AddToAccount")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> AddToAccount(string id, float value)
-        {
-            try
-            {
-
-                if (value == 0 || id is null)
-                {
-                    return BadRequest();
-                }
-
-                var transaction = _db.Database.BeginTransaction();
-                try
-                {
-                    var total = await _db.Safe.AsNoTracking().FirstOrDefaultAsync();
-                    var newValue = new Safe() { Id = total.Id, Total = total.Total + value };
-                    _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
-                    var company = await _unitOfWork.Companies.GetAsync(i => i.Id == id);
-                    if(company is null)
-                    {
-                        return BadRequest();
-                    }
-                    company.Account += value;
-                    await _db.SaveChangesAsync();
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                      transaction.Rollback();
-                    _response.ErrorMessages
-                    = new List<string>() { ex.ToString() };
-                    return _response;
-
-                }
-                _response.StatusCode = HttpStatusCode.Created;
-                return Ok(_response.Result);
-            }
-            catch (Exception ex)
-            {
-                _response.IsSuccess = false;
-                _response.ErrorMessages
-                     = new List<string>() { ex.ToString() };
-            }
-            return _response;
-        }
+        
     }
 }
