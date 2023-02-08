@@ -59,6 +59,7 @@ namespace system_backend.Services
             {
                 UserId = user.Id,
                 Username = user.UserName,
+                UserDisplayName=user.UserDisplayName,
                 ExpiresOn = jwtSecurityToken.ValidTo,
                 IsAuthenticated = true,
                 Role = new List<string>{model.Role},
@@ -85,6 +86,7 @@ namespace system_backend.Services
             authModel.IsAuthenticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.Username = user.UserName;
+            authModel.UserDisplayName = user.UserDisplayName;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Role = rolesList.ToList();
 

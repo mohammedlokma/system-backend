@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using system_backend.Data;
 
@@ -11,9 +12,10 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230207193509_edit-coupon-model")]
+    partial class editcouponmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,8 +413,8 @@ namespace system_backend.Migrations
                     b.Property<int?>("CertificateNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("CompanyName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("CompnyId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int?>("CouponNumber")
                         .HasColumnType("int");
@@ -432,6 +434,8 @@ namespace system_backend.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AgentId");
+
+                    b.HasIndex("CompnyId");
 
                     b.ToTable("Coupons");
                 });
@@ -473,9 +477,6 @@ namespace system_backend.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("AgentComment")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AgentName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CompanyComment")
@@ -747,7 +748,13 @@ namespace system_backend.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("system_backend.Models.Company", "Company")
+                        .WithMany("Coupons")
+                        .HasForeignKey("CompnyId");
+
                     b.Navigation("Agent");
+
+                    b.Navigation("Company");
                 });
 
             modelBuilder.Entity("system_backend.Models.ExpensesPayments", b =>
@@ -778,6 +785,8 @@ namespace system_backend.Migrations
             modelBuilder.Entity("system_backend.Models.Company", b =>
                 {
                     b.Navigation("Bills");
+
+                    b.Navigation("Coupons");
 
                     b.Navigation("Payments");
 

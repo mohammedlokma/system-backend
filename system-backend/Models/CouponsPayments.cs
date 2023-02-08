@@ -10,6 +10,7 @@ namespace system_backend.Models
         [ForeignKey("Agent")]
         public string AgentId { get; set; }
         public Agent Agent { get; set; }
+        public string? CompanyName { get; set; }
 
         [Required]
         public float Price { get; set; }

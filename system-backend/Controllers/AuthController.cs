@@ -48,7 +48,8 @@ namespace system_backend.Controllers
                 token = result.Token,
                 exp = result.ExpiresOn,
                 role = result.Role,
-                username = result.Username
+                username = result.Username,
+                userDisplayName = result.UserDisplayName
             });
         }
         [Authorize(Roles = Roles.Admin_Role)]

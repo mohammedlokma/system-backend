@@ -14,7 +14,6 @@ namespace system_backend.Controllers.Company
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Roles.Admin_Role)]
 
     public class CompanyController : ControllerBase
     {
@@ -30,6 +29,7 @@ namespace system_backend.Controllers.Company
             _response = new();
         }
         [HttpPost("CreateCompany")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -64,6 +64,7 @@ namespace system_backend.Controllers.Company
         }
 
         [HttpGet("GetCompany")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -97,6 +98,7 @@ namespace system_backend.Controllers.Company
             return _response;
         }
         [HttpGet("GetCompanies")]
+        [Authorize(Roles = Roles.Admin_Role+","+Roles.User_Role)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -121,6 +123,7 @@ namespace system_backend.Controllers.Company
 
         }
         [HttpPut("UpdateCompany")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -151,12 +154,12 @@ namespace system_backend.Controllers.Company
             }
             return _response;
         }
-
+        [HttpDelete("DeleteCompany")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [HttpDelete("DeleteCompany")]
         public async Task<ActionResult<ApiRespose>> DeleteCompany(string id)
         {
             try
