@@ -555,6 +555,287 @@ namespace system_backend.Controllers.Report
             }
             return _response;
         }
+        [HttpPost("AddRow")]
+        [Authorize(Roles = Roles.Admin_Role)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> AddRow([FromBody] Dictionary<string,string> jsonObject )
+        {
+            try
+            {
+
+                if (jsonObject == null)
+                {
+                    return BadRequest();
+                }
+
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                var query = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='FullReport'";
+
+                SqlConnection connection = new SqlConnection(connectionString);
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd);
+                DataTable dt = new DataTable();
+                connection.Open();
+                da.Fill(dt);
+                var columns = dt.AsEnumerable().Select(i => i.ItemArray).ToList();
+
+              
+                var keys = "";
+                var vals = "";
+                for (int i = 0; i < columns.Count; ++i)
+                {
+                    if(jsonObject.ContainsKey(columns[i][0].ToString()))
+                    {
+                        keys += columns[i][0].ToString();
+                        if (i < columns.Count - 1) keys += ",";
+                        vals += "N'";
+                        vals += jsonObject[columns[i][0].ToString()];
+                        vals += "'";
+                        if (i < columns.Count - 1) vals += ",";
+                    }
+                }
+                
+
+                string queryString =
+                   "INSERT INTO FullReport (" + keys + ") VALUES(" + vals + ");";
+
+                SqlCommand cmd2 = new SqlCommand(queryString, connection);
+                cmd2.ExecuteNonQuery();
+                connection.Close();
+                // await _db.SaveChangesAsync();
+                _response.Result = jsonObject;
+                _response.StatusCode = HttpStatusCode.Created;
+                return Ok(_response.Result);
+            }
+
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+        [HttpGet("GetFullReportData")]
+        [Authorize(Roles = Roles.User_Role + "," + Roles.Admin_Role +"," + Roles.Company_Role)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> GetFullReportData()
+        {
+            try
+            {
+
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                var query = "SELECT * FROM FullReport WHERE ReleaseStatus = 'false'";
+                var columnsQuery = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='FullReport'";
+
+                SqlConnection connection = new SqlConnection(connectionString);
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+                SqlCommand cmd2 = new SqlCommand(columnsQuery, connection);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                DataTable dt = new DataTable();
+                connection.Open();
+                da.Fill(dt);
+                var columns = dt.AsEnumerable().Select(i => i.ItemArray).ToList();
+                var list = new List<object>();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                
+                while (reader.Read())
+                {
+                IDictionary<string, object> myDict = new Dictionary<string, object>();
+                    var eo = new ExpandoObject();
+                    var eoColl = (ICollection<KeyValuePair<string, object>>)eo;
+                    for (int i=0; i <= reader.FieldCount -1; i++)
+                    {
+                        myDict.Add(columns[i][0].ToString(), reader[i].ToString());
+                       
+                    };
+                    foreach(var kvp in myDict)
+                    {
+                        eoColl.Add(kvp);
+                    }
+                    list.Add(eoColl);
+
+                }
+                connection.Close();
+                _response.Result = list;
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPut("UpdateShipmentStatus")]
+        [Authorize(Roles = Roles.Admin_Role)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> UpdateShipmentStatus(int id, DateTime releaseDate)
+        {
+            try
+            {
+                if (id == 0 )
+                {
+                    return BadRequest();
+                }
+                var shipment = await _db.FullReport.FindAsync(id);
+                if(shipment is null)
+                {
+                    return BadRequest();
+                }
+                shipment.ReleaseStatus = true;
+                shipment.ReleaseDate = releaseDate;
+                await _db.SaveChangesAsync();
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpGet("GetReleasedShipments")]
+        [Authorize(Roles = Roles.User_Role + "," + Roles.Admin_Role + "," + Roles.Company_Role)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> GetReleasedShipments()
+        {
+            try
+            {
+
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                var query = "SELECT * FROM FullReport WHERE ReleaseStatus = 'true'";
+                var columnsQuery = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='FullReport'";
+
+                SqlConnection connection = new SqlConnection(connectionString);
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+                SqlCommand cmd2 = new SqlCommand(columnsQuery, connection);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                DataTable dt = new DataTable();
+                connection.Open();
+                da.Fill(dt);
+                var columns = dt.AsEnumerable().Select(i => i.ItemArray).ToList();
+                var list = new List<object>();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    IDictionary<string, object> myDict = new Dictionary<string, object>();
+                    var eo = new ExpandoObject();
+                    var eoColl = (ICollection<KeyValuePair<string, object>>)eo;
+                    for (int i = 0; i <= reader.FieldCount - 1; i++)
+                    {
+                        myDict.Add(columns[i][0].ToString(), reader[i].ToString());
+
+                    };
+                    foreach (var kvp in myDict)
+                    {
+                        eoColl.Add(kvp);
+                    }
+                    list.Add(eoColl);
+
+                }
+                connection.Close();
+                _response.Result = list;
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpGet("GetRow")]
+        [Authorize(Roles =  Roles.Admin_Role)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> GetRow(int id)
+        {
+            try
+            {
+
+                var connectionString = _configuration.GetConnectionString("DefaultConnection");
+
+                var query = "SELECT * FROM FullReport WHERE Id = " + id+"";
+                var columnsQuery = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME ='FullReport'";
+
+                SqlConnection connection = new SqlConnection(connectionString);
+
+                SqlCommand cmd = new SqlCommand(query, connection);
+                SqlCommand cmd2 = new SqlCommand(columnsQuery, connection);
+
+                SqlDataAdapter da = new SqlDataAdapter(cmd2);
+                DataTable dt = new DataTable();
+                connection.Open();
+                da.Fill(dt);
+                var columns = dt.AsEnumerable().Select(i => i.ItemArray).ToList();
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                IDictionary<string, object> myDict = new Dictionary<string, object>();
+                var eo = new ExpandoObject();
+                var eoColl = (ICollection<KeyValuePair<string, object>>)eo;
+                while (reader.Read())
+                {
+                   
+                    for (int i = 0; i <= reader.FieldCount - 1; i++)
+                    {
+                        myDict.Add(columns[i][0].ToString(), reader[i].ToString());
+
+                    };
+                    foreach (var kvp in myDict)
+                    {
+                        eoColl.Add(kvp);
+                    }
+
+                }
+                connection.Close();
+                _response.Result = eo;
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
         [HttpPut("UpdateRow")]
         [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status201Created)]
