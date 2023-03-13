@@ -210,7 +210,7 @@ namespace system_backend.Controllers.Agents
                     {
                         _response.ErrorMessages
                      = new List<string>() { "الخزنة لا يتوافر بها هذه القيمه" };
-                        return _response;
+                        return BadRequest(_response);
 
                     }
                     var newValue = new Safe() { Id = total.Id, Total = total.Total - value };

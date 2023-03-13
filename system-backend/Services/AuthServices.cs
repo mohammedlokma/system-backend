@@ -59,6 +59,7 @@ namespace system_backend.Services
             {
                 UserId = user.Id,
                 Username = user.UserName,
+                UserDisplayName=user.UserDisplayName,
                 ExpiresOn = jwtSecurityToken.ValidTo,
                 IsAuthenticated = true,
                 Role = new List<string>{model.Role},
@@ -85,6 +86,7 @@ namespace system_backend.Services
             authModel.IsAuthenticated = true;
             authModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authModel.Username = user.UserName;
+            authModel.UserDisplayName = user.UserDisplayName;
             authModel.ExpiresOn = jwtSecurityToken.ValidTo;
             authModel.Role = rolesList.ToList();
 
@@ -102,12 +104,12 @@ namespace system_backend.Services
 
             foreach (var role in roles)
                 roleClaims.Add(new Claim("roles", role));
-            var iat= new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString();
+            var iat= new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds();
             var claims = new[]
             {
                new Claim("userName", user.UserName),
                new Claim("userId", user.Id),
-               new Claim(JwtRegisteredClaimNames.Iat, iat)
+               new Claim(JwtRegisteredClaimNames.Iat, iat.ToString())
 
             }
             .Union(userClaims)
@@ -116,7 +118,6 @@ namespace system_backend.Services
 
             var symmetricSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Key));
             var signingCredentials = new SigningCredentials(symmetricSecurityKey, SecurityAlgorithms.HmacSha256);
-
             var jwtSecurityToken = new JwtSecurityToken(
                 issuer: _jwt.Issuer,
                 audience: _jwt.Audience,

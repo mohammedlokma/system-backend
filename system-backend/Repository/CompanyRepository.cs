@@ -113,9 +113,12 @@ namespace system_backend.Repository
                                     Account = company.Account,
                                     Payments = 
                                     _mapper.Map<List<PaymentsDTO>>
-                                    (_db.CompanyPayments.Where(i=>i.CompanyId == id).ToList()),
+                                    (_db.CompanyPayments.Where(i=>i.CompanyId == id)
+                                    .OrderByDescending(i => i.Id).Take(10).ToList()),
+
                                     Bills = _mapper.Map<List<BillsDTO>>
-                                    (_db.Bills.Where(i => i.CompanyId == id).ToList()),
+                                    (_db.Bills.Where(i => i.CompanyId == id)
+                                    .OrderByDescending(i => i.Id).Take(10).ToList()),
                                 }).FirstOrDefaultAsync();
 
             var companyDTO = _mapper.Map<CompanyModel>(companyModel);

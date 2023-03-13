@@ -12,7 +12,6 @@ using system_backend.Models.Dtos;
 namespace system_backend.Controllers.Company
 {
     [Route("api/[controller]")]
-    [Authorize(Roles = Roles.Admin_Role)]
 
     [ApiController]
     public class BillsController : ControllerBase
@@ -27,8 +26,9 @@ namespace system_backend.Controllers.Company
             _mapper = mapper;
             _response = new();
         }
-       
+      
         [HttpPost("CreateBill")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -57,8 +57,64 @@ namespace system_backend.Controllers.Company
             }
             return _response;
         }
-        
+
+        [HttpGet("GetBills")]
+        [Authorize(Roles = Roles.User_Role + "," + Roles.Admin_Role)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> GetBills(string id, DateTime startDate, DateTime endDate)
+        {
+            try
+            {
+
+                var bills = await _db.Bills.Where(i => i.CompanyId == id && i.Date >= startDate && i.Date < endDate).ToListAsync();
+                _response.Result = _mapper.Map<List<BillsDTO>>(bills);
+                _response.StatusCode = HttpStatusCode.OK;
+                return Ok(_response.Result);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
+        [HttpPut("UpdateBill")]
+        [Authorize(Roles = Roles.User_Role)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<ApiRespose>> UpdateBill(int id, [FromBody] BillsDTO updateDTO)
+        {
+            try
+            {
+                if (updateDTO == null || id != updateDTO.Id)
+                {
+                    return BadRequest();
+                }
+
+                var bill = _mapper.Map<Bills>(updateDTO);
+
+                _db.Bills.Update(bill);
+                await _db.SaveChangesAsync();
+                _response.StatusCode = HttpStatusCode.NoContent;
+                _response.IsSuccess = true;
+                return Ok(_response);
+            }
+            catch (Exception ex)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessages
+                     = new List<string>() { ex.ToString() };
+            }
+            return _response;
+        }
         [HttpDelete("DeleteBill")]
+        [Authorize(Roles = Roles.Admin_Role)]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

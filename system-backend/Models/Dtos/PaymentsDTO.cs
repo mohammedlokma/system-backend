@@ -6,6 +6,7 @@
         public string CompanyId { get; set; }
         public float Price { get; set; }
         public string? Details { get; set; }
+        public string Type { get; set; }
         public DateTime Date { get; set; }
     }
 }

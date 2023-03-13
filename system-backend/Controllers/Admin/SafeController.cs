@@ -37,9 +37,17 @@ namespace system_backend.Controllers.Admin
             {
 
                 var total = await _db.Safe.FirstOrDefaultAsync();
-                _response.Result = total;
+                var totalIncome = await _db.SafeInputs.SumAsync(i => i.Price);
+                var totalOutcome = await _db.SafeOutputs.SumAsync(i => i.Price);
+                var obj = new SafeDto()
+                {
+                    Total = total.Total,
+                    TotalIncome = totalIncome,
+                    TotalOutcome = totalOutcome
+                };
+                _response.Result = obj;
                 _response.StatusCode = HttpStatusCode.OK;
-                return Ok(total);
+                return Ok(_response.Result);
             }
             catch (Exception ex)
             {
@@ -112,7 +120,7 @@ namespace system_backend.Controllers.Admin
                 try
                 {
                     await _db.SafeInputs.AddAsync(safeModel);
-                    await UpdateSafe(safeModel.Price);
+                    await UpdateSafe(safeModel.Price,true);
                     await _db.SaveChangesAsync();
                     transaction.Commit();
                 }
@@ -151,7 +159,7 @@ namespace system_backend.Controllers.Admin
                 try
                 {
                     await _db.SafeOutputs.AddAsync(safeModel);
-                    await UpdateSafe(safeModel.Price);
+                    await UpdateSafe(safeModel.Price,false);
                     await _db.SaveChangesAsync();
                     transaction.Commit();
                 }
@@ -171,12 +179,8 @@ namespace system_backend.Controllers.Admin
             }
             return _response;
         }
-        [HttpPut("UpdateSafe")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiRespose>> UpdateSafe(double value)
+        [HttpPost("UpdateSafe")]
+        public async Task<ActionResult<ApiRespose>> UpdateSafe(double value,bool input)
         {
             try
             {
@@ -185,9 +189,17 @@ namespace system_backend.Controllers.Admin
                     return BadRequest();
                 }
                 var total = await _db.Safe.AsNoTracking().FirstOrDefaultAsync();
-                var newValue = new Safe() { Id= total.Id ,Total= total.Total + value };
-                    
-               _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
+                Safe newValue;
+                if (input)
+                {
+                     newValue = new Safe() { Id = total.Id, Total = total.Total + value };
+                }
+                else
+                {
+                     newValue = new Safe() { Id = total.Id, Total = total.Total - value };
+
+                }
+                _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
                 await _db.SaveChangesAsync();
                 _response.StatusCode = HttpStatusCode.NoContent;
                 _response.IsSuccess = true;

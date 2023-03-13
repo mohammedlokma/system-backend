@@ -12,8 +12,8 @@ using system_backend.Data;
 namespace system_backend.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230115131741_seed-data3")]
-    partial class seeddata3
+    [Migration("20230306115337_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -49,6 +49,29 @@ namespace system_backend.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "2e354c92-5706-4ff7-89d7-297fbd02e3e5",
+                            ConcurrencyStamp = "2e354c92-5706-4ff7-89d7-297fbd02e3e5",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "e6e4c5ba-edde-4724-bab3-bf0eb88e905c",
+                            ConcurrencyStamp = "e6e4c5ba-edde-4724-bab3-bf0eb88e905c",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        },
+                        new
+                        {
+                            Id = "7ad93ac8-3bdd-4b5d-9a12-3b162beb5fe8",
+                            ConcurrencyStamp = "7ad93ac8-3bdd-4b5d-9a12-3b162beb5fe8",
+                            Name = "Compnay",
+                            NormalizedName = "Company"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -136,6 +159,13 @@ namespace system_backend.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
+                            RoleId = "2e354c92-5706-4ff7-89d7-297fbd02e3e5"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -267,6 +297,152 @@ namespace system_backend.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "090a9504-f2dc-43f5-875c-b27237c45f02",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@GMAIL.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAEAACcQAAAAENVT4tnyPjPWQOoB5qs+Mtn0ppat9mf9dTMKojjo6kUZoOwUH5ADIYbRPfghsMzRyg==",
+                            PhoneNumber = "1234567890",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "76636bcf-d749-4698-9d8d-1859c942cb4e",
+                            TwoFactorEnabled = false,
+                            UserDisplayName = "ADMIN",
+                            UserName = "admin"
+                        });
+                });
+
+            modelBuilder.Entity("system_backend.Models.BillDetails", b =>
+                {
+                    b.Property<int>("MyProperty")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("MyProperty"), 1L, 1);
+
+                    b.Property<int>("BillId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.HasKey("MyProperty");
+
+                    b.HasIndex("BillId");
+
+                    b.ToTable("BillDetails");
+                });
+
+            modelBuilder.Entity("system_backend.Models.Bills", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CompanyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Total")
+                        .HasColumnType("real");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("Bills");
+                });
+
+            modelBuilder.Entity("system_backend.Models.Company", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<double>("Account")
+                        .HasColumnType("float");
+
+                    b.Property<int?>("ReportItemsId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReportItemsId");
+
+                    b.ToTable("Companies");
+                });
+
+            modelBuilder.Entity("system_backend.Models.CompanyPayments", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CompanyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Details")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("Price")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.ToTable("CompanyPayments");
+                });
+
+            modelBuilder.Entity("system_backend.Models.CompanyReportItems", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("CompanyId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("ReportItemId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CompanyId");
+
+                    b.HasIndex("ReportItemId");
+
+                    b.ToTable("CompanyReportItems");
                 });
 
             modelBuilder.Entity("system_backend.Models.CouponsPayments", b =>
@@ -286,6 +462,9 @@ namespace system_backend.Migrations
 
                     b.Property<int?>("CertificateNumber")
                         .HasColumnType("int");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CouponNumber")
                         .HasColumnType("int");
@@ -335,6 +514,62 @@ namespace system_backend.Migrations
                     b.HasIndex("AgentId");
 
                     b.ToTable("Expenses");
+                });
+
+            modelBuilder.Entity("system_backend.Models.FullReport", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("AgentComment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("AgentName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyComment")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReleaseDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("ReleaseStatus")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FullReport");
+                });
+
+            modelBuilder.Entity("system_backend.Models.ReportItems", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("ArabicName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ReportItems");
                 });
 
             modelBuilder.Entity("system_backend.Models.Safe", b =>
@@ -500,6 +735,65 @@ namespace system_backend.Migrations
                     b.Navigation("ServicePlaces");
                 });
 
+            modelBuilder.Entity("system_backend.Models.BillDetails", b =>
+                {
+                    b.HasOne("system_backend.Models.Bills", "Bill")
+                        .WithMany("BillDetails")
+                        .HasForeignKey("BillId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bill");
+                });
+
+            modelBuilder.Entity("system_backend.Models.Bills", b =>
+                {
+                    b.HasOne("system_backend.Models.Company", "Company")
+                        .WithMany("Bills")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("system_backend.Models.Company", b =>
+                {
+                    b.HasOne("system_backend.Models.ReportItems", null)
+                        .WithMany("Companies")
+                        .HasForeignKey("ReportItemsId");
+                });
+
+            modelBuilder.Entity("system_backend.Models.CompanyPayments", b =>
+                {
+                    b.HasOne("system_backend.Models.Company", "Company")
+                        .WithMany("Payments")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("system_backend.Models.CompanyReportItems", b =>
+                {
+                    b.HasOne("system_backend.Models.Company", "Company")
+                        .WithMany("ReportItems")
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("system_backend.Models.ReportItems", "ReportItem")
+                        .WithMany()
+                        .HasForeignKey("ReportItemId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+
+                    b.Navigation("ReportItem");
+                });
+
             modelBuilder.Entity("system_backend.Models.CouponsPayments", b =>
                 {
                     b.HasOne("system_backend.Models.Agent", "Agent")
@@ -529,6 +823,25 @@ namespace system_backend.Migrations
                     b.Navigation("Expenses");
 
                     b.Navigation("ServicePlaces");
+                });
+
+            modelBuilder.Entity("system_backend.Models.Bills", b =>
+                {
+                    b.Navigation("BillDetails");
+                });
+
+            modelBuilder.Entity("system_backend.Models.Company", b =>
+                {
+                    b.Navigation("Bills");
+
+                    b.Navigation("Payments");
+
+                    b.Navigation("ReportItems");
+                });
+
+            modelBuilder.Entity("system_backend.Models.ReportItems", b =>
+                {
+                    b.Navigation("Companies");
                 });
 
             modelBuilder.Entity("system_backend.Models.ServicePlaces", b =>

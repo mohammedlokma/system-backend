@@ -47,6 +47,29 @@ namespace system_backend.Migrations
                         .HasFilter("[NormalizedName] IS NOT NULL");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "2e354c92-5706-4ff7-89d7-297fbd02e3e5",
+                            ConcurrencyStamp = "2e354c92-5706-4ff7-89d7-297fbd02e3e5",
+                            Name = "Admin",
+                            NormalizedName = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = "e6e4c5ba-edde-4724-bab3-bf0eb88e905c",
+                            ConcurrencyStamp = "e6e4c5ba-edde-4724-bab3-bf0eb88e905c",
+                            Name = "User",
+                            NormalizedName = "USER"
+                        },
+                        new
+                        {
+                            Id = "7ad93ac8-3bdd-4b5d-9a12-3b162beb5fe8",
+                            ConcurrencyStamp = "7ad93ac8-3bdd-4b5d-9a12-3b162beb5fe8",
+                            Name = "Compnay",
+                            NormalizedName = "Company"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -134,6 +157,13 @@ namespace system_backend.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("AspNetUserRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            UserId = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
+                            RoleId = "2e354c92-5706-4ff7-89d7-297fbd02e3e5"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
@@ -265,6 +295,26 @@ namespace system_backend.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = "02174cf0–9412–4cfe - afbf - 59f706d72cf6",
+                            AccessFailedCount = 0,
+                            ConcurrencyStamp = "090a9504-f2dc-43f5-875c-b27237c45f02",
+                            Email = "admin@gmail.com",
+                            EmailConfirmed = false,
+                            LockoutEnabled = false,
+                            NormalizedEmail = "ADMIN@GMAIL.COM",
+                            NormalizedUserName = "ADMIN",
+                            PasswordHash = "AQAAAAEAACcQAAAAENVT4tnyPjPWQOoB5qs+Mtn0ppat9mf9dTMKojjo6kUZoOwUH5ADIYbRPfghsMzRyg==",
+                            PhoneNumber = "1234567890",
+                            PhoneNumberConfirmed = false,
+                            SecurityStamp = "76636bcf-d749-4698-9d8d-1859c942cb4e",
+                            TwoFactorEnabled = false,
+                            UserDisplayName = "ADMIN",
+                            UserName = "admin"
+                        });
                 });
 
             modelBuilder.Entity("system_backend.Models.BillDetails", b =>
@@ -358,6 +408,10 @@ namespace system_backend.Migrations
                     b.Property<float>("Price")
                         .HasColumnType("real");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CompanyId");
@@ -406,6 +460,9 @@ namespace system_backend.Migrations
 
                     b.Property<int?>("CertificateNumber")
                         .HasColumnType("int");
+
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("CouponNumber")
                         .HasColumnType("int");
@@ -468,10 +525,16 @@ namespace system_backend.Migrations
                     b.Property<string>("AgentComment")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("AgentName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("CompanyComment")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ReleaseDate")
+                    b.Property<string>("CompanyName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<bool>("ReleaseStatus")

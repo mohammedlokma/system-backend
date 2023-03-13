@@ -8,7 +8,9 @@ namespace system_backend.Models
         public int Id { get; set; }
         public string? CompanyComment { get; set; }
         public string? AgentComment { get; set; }
+        public string? AgentName { get; set; }
+        public string? CompanyName { get; set; }
         public bool ReleaseStatus { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public DateTime? ReleaseDate { get; set; }
     }
 }
