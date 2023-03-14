@@ -124,12 +124,16 @@ namespace system_backend.Controllers.Admin
                     await _db.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
                     transaction.Rollback();
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages
+                         = new List<string>() { ex.ToString() };
+                    return _response;
                 }
-                
+
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);
             }
@@ -163,10 +167,14 @@ namespace system_backend.Controllers.Admin
                     await _db.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
                     transaction.Rollback();
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages
+                         = new List<string>() { ex.ToString() };
+                    return _response;
                 }
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);

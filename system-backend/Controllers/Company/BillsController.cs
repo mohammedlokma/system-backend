@@ -8,6 +8,7 @@ using system_backend.Const;
 using system_backend.Data;
 using system_backend.Models;
 using system_backend.Models.Dtos;
+using system_backend.Repository.Interfaces;
 
 namespace system_backend.Controllers.Company
 {
@@ -19,11 +20,13 @@ namespace system_backend.Controllers.Company
         protected ApiRespose _response;
         private readonly ApplicationDbContext _db;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unit;
             
-        public BillsController(ApplicationDbContext db, IMapper mapper)
+        public BillsController(ApplicationDbContext db, IMapper mapper, IUnitOfWork unit)
         {
             _db = db;
             _mapper = mapper;
+            _unit = unit;
             _response = new();
         }
       
@@ -145,5 +148,6 @@ namespace system_backend.Controllers.Company
             }
             return _response;
         }
+      
     }
 }

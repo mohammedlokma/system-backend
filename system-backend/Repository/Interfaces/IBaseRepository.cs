@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using system_backend.Models.Dtos;
 
 namespace system_backend.Repository.Interfaces

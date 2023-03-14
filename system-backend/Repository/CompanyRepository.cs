@@ -149,7 +149,7 @@ namespace system_backend.Repository
                 await _db.SaveChangesAsync();
                 transaction.Commit();
             }
-            catch
+            catch(Exception ex)
             {
                 transaction.Rollback();
             }

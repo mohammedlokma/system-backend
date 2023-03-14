@@ -90,6 +90,7 @@ namespace system_backend.Repository
         {
             dbSet.AttachRange(entities);
         }
+        
 
     }
     

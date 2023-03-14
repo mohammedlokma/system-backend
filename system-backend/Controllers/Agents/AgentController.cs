@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using System.Net;
 using system_backend.Const;
 using system_backend.Data;
@@ -206,13 +207,13 @@ namespace system_backend.Controllers.Agents
                 try
                 {
                     var total = await _db.Safe.AsNoTracking().FirstOrDefaultAsync();
-                    if(value > total.Total)
-                    {
-                        _response.ErrorMessages
-                     = new List<string>() { "الخزنة لا يتوافر بها هذه القيمه" };
-                        return BadRequest(_response);
+                    //if(value > total.Total)
+                    //{
+                    //    _response.ErrorMessages
+                    // = new List<string>() { "الخزنة لا يتوافر بها هذه القيمه" };
+                    //    return BadRequest(_response);
 
-                    }
+                    //}
                     var newValue = new Safe() { Id = total.Id, Total = total.Total - value };
                     _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
                     var agent = await _unitOfWork.Agents.GetAsync(i=>i.Id== id);
@@ -221,13 +222,24 @@ namespace system_backend.Controllers.Agents
                         return BadRequest();
                     }
                     agent.custody += value;
+                    var safeModel = new SafeOutputs() { 
+                    Date= DateTime.Now,
+                    details = "تخريج عهده لمندوب ",
+                    Price = value,
+                    };
+                    await _db.SafeOutputs.AddAsync(safeModel);
                     await _db.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    throw;
+                    transaction.Rollback();
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages
+                         = new List<string>() { ex.ToString() };
+                    return _response;
+
                 }
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);
@@ -266,14 +278,25 @@ namespace system_backend.Controllers.Agents
                     }
                     var newValue = new Safe() { Id = total.Id, Total = total.Total + agent.custody };
                     _db.Safe.Attach(newValue).Property(x => x.Total).IsModified = true;
+                    var safeModel = new SafeInputs()
+                    {
+                        Date = DateTime.Now,
+                        details = "سحب عهده من مندوب ",
+                        Price = agent.custody,
+                    };
+                    await _db.SafeInputs.AddAsync(safeModel);
                     agent.custody =0;
                     await _db.SaveChangesAsync();
                     transaction.Commit();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
 
-                    throw;
+                    transaction.Rollback();
+                    _response.IsSuccess = false;
+                    _response.ErrorMessages
+                         = new List<string>() { ex.ToString() };
+                    return _response;
                 }
                 _response.StatusCode = HttpStatusCode.Created;
                 return Ok(_response.Result);
